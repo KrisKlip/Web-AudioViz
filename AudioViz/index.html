@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>
+  Audio Visualizer
+</title>
+<style type="text/css">
+  html, body {
+    background-color: #2a2a2a;
+    text-align: center;
+  }
+  canvas{
+    top: 0%;
+    position: absolute;
+    left: 0%;
+    text-align: center;
+    margin: 0 auto;
+    border: none !important;
+  }
+  input, audio, #mask{
+    top: 20%;
+    left: 41%;
+    position: absolute;
+    z-index: 1;
+  }
+  
+  #myAudio{
+    transition-property: opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: linear;
+    opacity: .2;
+  }
+  #myAudio:hover {
+    opacity: 1;
+  }
+  #submit {
+    margin-left: 300px;
+    display: none;
+  }
+  #audioFile {
+      display: none;
+  }
+  .links {
+  margin-top: 800px;
+  outline: 0;
+  padding:10px;
+  background-color: #575757;
+  color: #E9E9E9;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid #484848;
+  -webkit-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.50);
+  -moz-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.50);
+  box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.50);
+
+}
+a:active {
+  -webkit-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.10);
+  -moz-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.10);
+  box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.10);
+}
+a:hover {
+  -webkit-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.99);
+  -moz-box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.99);
+  box-shadow: 3px 9px 18px 0px rgba(0,0,0,0.99);
+}
+.flip-clock-meridium a{
+  color: #D8D8D8 !important;
+}
+.flip-clock-wrapper, .clock {
+  text-align: center !important;
+  width: 60% !important;
+  margin: 0 auto !important;
+  position: none !important;
+}
+.inline {
+  display: inline-block;  
+  margin: 5px;
+  margin-left: 100px;
+}
+.hvr-grow-rotate {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-grow-rotate:hover, .hvr-grow-rotate:focus, .hvr-grow-rotate:active {
+  -webkit-transform: scale(1.1) rotate(4deg);
+  transform: scale(1.1) rotate(4deg);
+}
+</style>
+</head>
+<body>
+  <input id="audioFile" type="file" name="audio" accept=".mp3"/>
+  <input id = "submit" type="submit" onclick = "play()">
+  <div id = "mask">
+  </div>
+<audio id="myAudio" controls ="" src="killabyte.mp3"></audio>
+<br>
+<br>
+<br>
+<canvas id="myCanvas" width="2000" height="1000" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<div class = "inline">
+  <a onclick = "changeSRC1()" class="links hvr-grow-rotate" id = "media" target = "">Killabyte - Our Story</a>
+</div>
+<div class = "inline">
+  <a onclick = "changeSRC2()" class="links hvr-grow-rotate" id = "media" target = "">Griz x Big Gigantic - Good Times Roll </a>
+</div>
+<div class = "inline">
+  <a onclick = "changeSRC3()" class="links hvr-grow-rotate" id = "media" target = "">Thijs Bos - Feng Huang</a>
+</div>
+<div class = "inline">
+  <a onclick = "changeSRC4()" class="links hvr-grow-rotate" id = "media" target = "">Kaskade - Disarm You ft. Ilsey (Grey Remix)</a>
+</div>
+<div class = "inline">
+  <a onclick = "changeSRC5()" class="links hvr-grow-rotate" id = "media" target = "">Offchopped - Million Miles (Virtual Riot Remix)</a>
+</div>
+<script>
+window.onload = function() {
+
+  /////////////////////////
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var source;
+  var stream;
+  var audio = document.getElementById('myAudio');
+  var analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  var lowR = 0;
+  var c=document.getElementById("myCanvas");
+  var ctx=c.getContext("2d");
+  function renderFrame() {
+    ctx.fillStyle="#2a2a2a";
+    ctx.fillRect(0,0,2000,1000); 
+    ctx.strokeStyle="#ffffff";
+    requestAnimationFrame(renderFrame);
+       // update data in frequencyData
+    analyser.getByteFrequencyData(frequencyData);
+       // render frame based on values in frequencyData
+    low1R = frequencyData[500];
+    low2R = frequencyData[450];
+    low3R = frequencyData[400];
+    mid1R = frequencyData[350];
+    mid2R = frequencyData[300];
+    mid3R = frequencyData[250];
+    high1R = frequencyData[200];
+    high2R = frequencyData[150];
+    high3R = frequencyData[100];
+    top1R = frequencyData[50];
+    top2R = frequencyData[10];
+
+
+    r1 = frequencyData[600];
+    r2 = frequencyData[560];
+    r3 = frequencyData[530];
+    r4 = frequencyData[500];
+    r5 = frequencyData[460];
+    r6 = frequencyData[430];
+    r7 = frequencyData[400];
+    r8 = frequencyData[360];
+    r9 = frequencyData[330];
+    r10 = frequencyData[300];
+    r11 = frequencyData[260];
+    r12 = frequencyData[230];
+    r13 = frequencyData[200];
+    r14 = frequencyData[160];
+    r15 = frequencyData[130];
+    r16 = frequencyData[100];
+    r17 = frequencyData[60];
+    r18 = frequencyData[30];
+    r19 = frequencyData[10];
+    r20 = frequencyData[600];
+    r21 = frequencyData[600];
+    r22 = frequencyData[600];
+    r23 = frequencyData[600];
+    r24 = frequencyData[600];
+    r25 = frequencyData[600];
+    r26 = frequencyData[600];
+    r27 = frequencyData[600];
+    r28 = frequencyData[600];
+    r29 = frequencyData[600];
+    r30 = frequencyData[600];
+    r31 = frequencyData[600];
+    r32 = frequencyData[600];
+    r33 = frequencyData[600];
+    r34 = frequencyData[600];
+    r35 = frequencyData[600];
+    r36 = frequencyData[600];
+    r37 = frequencyData[600];
+    r38 = frequencyData[600];
+
+
+
+
+    ctx.beginPath();
+    ctx.arc(900,500,low1R,0,2*low1R/10);
+    ctx.arc(900,500,low2R,0,2*Math.PI);
+    ctx.arc(900,500,low3R,0,2*Math.PI);
+    ctx.arc(900,500,mid1R,0,2*Math.PI);
+    ctx.arc(900,500,mid2R,0,2*Math.PI);
+    ctx.arc(900,500,mid3R,0,2*Math.PI);
+    ctx.arc(900,500,high1R,0,2*Math.PI);
+    ctx.arc(900,500,high2R,0,2*Math.PI);
+    ctx.arc(900,500,high3R,0,2*Math.PI);
+    ctx.arc(900,500,top1R,0,2*Math.PI);
+    ctx.arc(900,500,top2R,0,2*Math.PI);
+    ctx.lineWidth=5;
+    ctx.stroke();
+    ctx.fillStyle="#0000ff";
+    ctx.fillRect(0,0,50,r19);
+    ctx.fillStyle="#002ffd";
+    ctx.fillRect(50,0,50,r18);
+    ctx.fillStyle="#005ff5";
+    ctx.fillRect(100,0,50,r17);
+    ctx.fillStyle="#00aff5";
+    ctx.fillRect(150,0,50,r16);
+    ctx.fillStyle="#00fff0";
+    ctx.fillRect(200,0,50,r15);
+    ctx.fillStyle="#00ffc0";
+    ctx.fillRect(250,0,50,r14);
+    ctx.fillStyle="#00ffa0";
+    ctx.fillRect(300,0,50,r13);
+    ctx.fillStyle="#00ff50";
+    ctx.fillRect(350,0,50,r12);
+    ctx.fillStyle="#00ff00";
+    ctx.fillRect(400,0,50,r11);
+    ctx.fillStyle="#0aff00";
+    ctx.fillRect(450,0,50,r10);
+    ctx.fillStyle="#0fff00";
+    ctx.fillRect(500,0,50,r9);
+    ctx.fillStyle="#0ffa00";
+    ctx.fillRect(550,0,50,r8);
+    ctx.fillStyle="#0ff500";
+    ctx.fillRect(600,0,50,r7);
+    ctx.fillStyle="#fff000";
+    ctx.fillRect(650,0,50,r6);
+    ctx.fillStyle="#ffc000";
+    ctx.fillRect(700,0,50,r5);
+    ctx.fillStyle="#ffa000";
+    ctx.fillRect(750,0,50,r4);
+    ctx.fillStyle="#ff5000";
+    ctx.fillRect(800,0,50,r3);
+    ctx.fillStyle="#ff3000";
+    ctx.fillRect(850,0,50,r2);
+    ctx.fillStyle="#ff1000";
+    ctx.fillRect(900,0,50,r1);
+    ctx.fillStyle="#ff3000";
+    ctx.fillRect(950,0,50,r1);
+    ctx.fillStyle="#ff5000";
+    ctx.fillRect(1000,0,50,r2);
+    ctx.fillStyle="#ffa000";
+    ctx.fillRect(1050,0,50,r3);
+    ctx.fillStyle="#ffc000";
+    ctx.fillRect(1100,0,50,r4);
+    ctx.fillStyle="#fff000";
+    ctx.fillRect(1150,0,50,r5);
+    ctx.fillStyle="#0ff500";
+    ctx.fillRect(1200,0,50,r6);
+    ctx.fillStyle="#0ffa00";
+    ctx.fillRect(1250,0,50,r7);
+    ctx.fillStyle="#0fff00";
+    ctx.fillRect(1300,0,50,r8);
+    ctx.fillStyle="#0aff00";
+    ctx.fillRect(1350,0,50,r9);
+    ctx.fillStyle="#00ff00";
+    ctx.fillRect(1400,0,50,r10);
+    ctx.fillStyle="#00ff50";
+    ctx.fillRect(1450,0,50,r11);
+    ctx.fillStyle="#00ffa0";
+    ctx.fillRect(1500,0,50,r12);
+    ctx.fillStyle="#00ffc0";
+    ctx.fillRect(1550,0,50,r13);
+    ctx.fillStyle="#00fff0";
+    ctx.fillRect(1600,0,50,r14);
+    ctx.fillStyle="#00aff5";
+    ctx.fillRect(1650,0,50,r15);
+    ctx.fillStyle="#005ff5";
+    ctx.fillRect(1700,0,50,r16);
+    ctx.fillStyle="#002ffd";
+    ctx.fillRect(1750,0,50,r17);
+    ctx.fillStyle="#0000ff";
+    ctx.fillRect(1800,0,50,r18);
+    ctx.fillStyle="#0000ff";
+    ctx.fillRect(1850,0,50,r19);
+  }
+  renderFrame();
+  //audio.play();
+  //////////////////
+  
+    
+};
+function changeSRC1(){
+  document.getElementById("myAudio").src = "killabyte.mp3";
+  console.log("success")
+}
+function changeSRC2(){
+  document.getElementById("myAudio").src = "griz.mp3";
+  console.log("success")
+}
+function changeSRC3(){
+  document.getElementById("myAudio").src = "feng.mp3";
+  console.log("success")
+}
+function changeSRC4(){
+  document.getElementById("myAudio").src = "grey.mp3";
+  console.log("success")
+}
+function changeSRC5(){
+  document.getElementById("myAudio").src = "riot.mp3";
+  console.log("success")
+}
+</script>
+</body>
+</html>
